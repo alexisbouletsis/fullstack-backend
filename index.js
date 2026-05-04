@@ -1,36 +1,21 @@
 const express = require("express");
 const app = express();
-// const morgan = require('morgan');
 
-// app.use(express.json());
-// app.use(morgan('tiny'));
-
-// morgan.token('body', (req) => {
-//   return JSON.stringify(req.body);
-// });
-
-// app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
-
-let persons = [
+let notes = [
   {
     id: "1",
-    name: "Arto Hellas",
-    number: "040-123456",
+    content: "HTML is easy",
+    important: true,
   },
   {
     id: "2",
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
+    content: "Browser can execute only JavaScript",
+    important: false,
   },
   {
     id: "3",
-    name: "Dan Abramov",
-    number: "12-43-234345",
-  },
-  {
-    id: "4",
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
+    content: "GET and POST are the most important methods of HTTP protocol",
+    important: true,
   },
 ];
 
@@ -50,69 +35,52 @@ app.get("/", (request, response) => {
   response.send("<h1>Hello World!</h1>");
 });
 
-app.get("/api/persons", (request, response) => {
-  response.json(persons);
+app.get("/api/notes", (request, response) => {
+  response.json(notes);
 });
 
-app.get("/api/persons/:id", (req, res) => {
-  const id = req.params.id;
-  const person = persons.find((person) => person.id === id);
+app.get("/api/notes/:id", (request, response) => {
+  const id = request.params.id;
+  const note = notes.find((note) => note.id === id);
 
-  if (person) {
-    res.send(person);
+  if (note) {
+    response.json(note);
   } else {
-    res.status(404).send(`Person with id:${id} is NOT FOUND.`);
+    response.status(404).end();
   }
-});
-
-app.get("/info", (req, res) => {
-  res.send(`
-    <p>
-      Phonebook has info for ${persons.length} people.
-      <br/>
-      ${Date()}
-    </p>`);
-});
-
-app.delete("/api/persons/:id", (req, res) => {
-  const id = req.params.id;
-  persons = persons.filter((person) => person.id !== id);
-
-  res.send(`Deleted person with id:${id}.`);
 });
 
 const generateId = () => {
   const maxId =
-    persons.length > 0 ? Math.floor(Math.random() * (200 - 5 + 1) + 5) : 0;
+    notes.length > 0 ? Math.max(...notes.map((n) => Number(n.id))) : 0;
   return String(maxId + 1);
 };
 
-app.post("/api/persons/", (req, res) => {
-  const body = req.body;
-  if (!body.name || !body.number) {
-    return res.status(400).json({
-      error: "name or number missing",
+app.post("/api/notes", (request, response) => {
+  const body = request.body;
+
+  if (!body.content) {
+    return response.status(400).json({
+      error: "content missing",
     });
   }
 
-  const nameExists = persons.some(
-    (p) => p.name.toLowerCase() === body.name.toLowerCase(),
-  );
-
-  if (nameExists) {
-    return res.status(400).json({
-      error: "name must be unique",
-    });
-  }
-
-  const person = {
+  const note = {
+    content: body.content,
+    important: body.important || false,
     id: generateId(),
-    number: body.number,
-    name: body.name,
   };
 
-  persons = persons.concat(person);
-  res.status(201).send(persons);
+  notes = notes.concat(note);
+
+  response.json(note);
+});
+
+app.delete("/api/notes/:id", (request, response) => {
+  const id = request.params.id;
+  notes = notes.filter((note) => note.id !== id);
+
+  response.status(204).end();
 });
 
 const unknownEndpoint = (request, response) => {
@@ -121,7 +89,7 @@ const unknownEndpoint = (request, response) => {
 
 app.use(unknownEndpoint);
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
