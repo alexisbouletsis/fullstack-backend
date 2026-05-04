@@ -114,7 +114,7 @@ app.post('/api/persons/', (req, res) => {
   }
 
   persons = persons.concat(person);
-  res.status(201).send(persons);
+  res.status(201).send(person);
 
 })
 
@@ -124,7 +124,7 @@ const unknownEndpoint = (request, response) => {
 
 app.use(unknownEndpoint)
 
-const PORT = process.env.PORT || 3000
-app.listen(PORT, () => {
+const PORT = process.env.PORT || 5000
+app.listen(PORT, '0.0.0.0',() => {
   console.log(`Server running on port ${PORT}`)
 })
