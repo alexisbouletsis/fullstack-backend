@@ -43,36 +43,11 @@ const requestLogger = (request, response, next) => {
 };
 
 app.use(requestLogger);
+app.use(express.static("dist"));
 app.use(express.json());
 
 app.get("/", (request, response) => {
-  const rows = persons
-    .map(
-      (p) =>
-        `<tr><td>${p.id}</td><td>${p.name}</td><td>${p.number}</td></tr>`
-    )
-    .join("");
-  response.send(`<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8"/>
-  <title>Phonebook</title>
-  <style>
-    body { font-family: sans-serif; padding: 2rem; }
-    h1 { margin-bottom: 1rem; }
-    table { border-collapse: collapse; width: 100%; max-width: 500px; }
-    th, td { border: 1px solid #ccc; padding: 0.5rem 1rem; text-align: left; }
-    th { background: #f5f5f5; }
-  </style>
-</head>
-<body>
-  <h1>Phonebook</h1>
-  <table>
-    <thead><tr><th>#</th><th>Name</th><th>Number</th></tr></thead>
-    <tbody>${rows}</tbody>
-  </table>
-</body>
-</html>`);
+  response.send("<h1>Hello World!</h1>");
 });
 
 app.get("/api/persons", (request, response) => {
@@ -147,6 +122,6 @@ const unknownEndpoint = (request, response) => {
 app.use(unknownEndpoint);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
