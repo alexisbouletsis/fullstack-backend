@@ -112,7 +112,8 @@ app.post("/api/persons/", (req, res) => {
   };
 
   persons = persons.concat(person);
-  res.status(201).send(persons);
+
+  res.status(201).send(person);
 });
 
 const unknownEndpoint = (request, response) => {
